@@ -4,6 +4,7 @@ const Usuario = require('./models/usuario.model');
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 app.get('/', (req, res) => {
     res.send("Bienvenido al servidor de API's");
@@ -59,6 +60,24 @@ app.put('/api/user/:id', async(req, res) => {
         res.status(500).json({message: error.message});
     }
 });
+
+app.delete('/api/users/:id', async(req, res) => {
+    try {
+        const { id } = req.params;
+        // const usuario = Usuario.findByIdAndDelete( {"_id": id} );
+        // if (!usuario)
+        //     return res.status(404).json({message: "El usuario no existe"});
+        // res.status(200).json( {message: "Usuario eliminado"} );
+
+        const usuario = await Usuario.find({"_id": id});
+        if (!usuario)
+            return res.status(404).json({message: "El usuario no existe"});
+        const eliminar = await Usuario.deleteOne({ "_id": id });
+        res.status(200).json( {message: "Usuario eliminado"} );
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
 
 //mongoose.connect('mongodb+srv://danielvazquez:TmzGE4BlqpUP5vWw@mebackend.aiee7.mongodb.net/Node-API?retryWrites=true&w=majority&appName=MEBackend')
 mongoose.connect('mongodb://localhost:27017/Node-API')
